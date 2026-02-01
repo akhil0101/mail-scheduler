@@ -9,6 +9,9 @@ export const authRouter = Router();
 
 const OAuth2 = google.auth.OAuth2;
 
+// Frontend URL for redirects
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 // Create OAuth2 client for user authentication
 const createAuthClient = () => {
   return new OAuth2(
@@ -41,7 +44,7 @@ authRouter.get('/google/callback', async (req: Request, res: Response) => {
   const { code } = req.query;
 
   if (!code || typeof code !== 'string') {
-    return res.redirect('http://localhost:5173/login?error=no_code');
+    return res.redirect(`${FRONTEND_URL}/login?error=no_code`);
   }
 
   try {
@@ -54,7 +57,7 @@ authRouter.get('/google/callback', async (req: Request, res: Response) => {
     const { data: googleUser } = await oauth2.userinfo.get();
 
     if (!googleUser.email) {
-      return res.redirect('http://localhost:5173/login?error=no_email');
+      return res.redirect(`${FRONTEND_URL}/login?error=no_email`);
     }
 
     // Find or create user
@@ -85,10 +88,10 @@ authRouter.get('/google/callback', async (req: Request, res: Response) => {
     });
 
     // Redirect to frontend with token
-    res.redirect(`http://localhost:5173/auth/callback?token=${token}`);
+    res.redirect(`${FRONTEND_URL}/auth/callback?token=${token}`);
   } catch (error) {
     console.error('Google auth error:', error);
-    res.redirect('http://localhost:5173/login?error=auth_failed');
+    res.redirect(`${FRONTEND_URL}/login?error=auth_failed`);
   }
 });
 
