@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   @default("")
+  name      String
+  googleId  String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Subscriber {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  isActive     Boolean  @default(true)
+  subscribedAt DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model EmailTemplate {
+  id        String   @id @default(cuid())
+  name      String
+  subject   String
+  body      String   @db.Text
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EmailLog {
+  id           String   @id @default(cuid())
+  subscriberId String
+  templateId   String?
+  subject      String
+  status       EmailStatus
+  error        String?
+  sentAt       DateTime @default(now())
+}
+
+model ScheduleConfig {
+  id        String   @id @default(cuid())
+  cronTime  String   @default("0 9 * * *") // Default: 9 AM daily
+  timezone  String   @default("UTC")
+  isActive  Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}
+
+enum EmailStatus {
+  SENT
+  FAILED
+  PENDING
+}
