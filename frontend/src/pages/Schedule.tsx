@@ -32,7 +32,7 @@ const commonSchedules = [
 ];
 
 export default function Schedule() {
-  const [config, setConfig] = useState<ScheduleConfig | null>(null);
+  const [, setConfig] = useState<ScheduleConfig | null>(null);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [logs, setLogs] = useState<EmailLog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
