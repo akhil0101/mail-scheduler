@@ -6,6 +6,16 @@ interface MetalPrices {
   timestamp: string;
 }
 
+// GoldAPI.io response type
+interface GoldApiResponse {
+  price_gram_24k: number;
+  price_gram_22k?: number;
+  price_gram_21k?: number;
+  price_gram_18k?: number;
+  price?: number;
+  price_gram?: number;
+}
+
 // Cache prices for 1 hour to avoid too many API calls (free tier has 300 requests/month)
 let cachedPrices: MetalPrices | null = null;
 let lastFetch: number = 0;
@@ -43,8 +53,8 @@ export const fetchMetalPrices = async (): Promise<MetalPrices> => {
       throw new Error('API request failed');
     }
 
-    const goldData = await goldRes.json();
-    const silverData = await silverRes.json();
+    const goldData = await goldRes.json() as GoldApiResponse;
+    const silverData = await silverRes.json() as GoldApiResponse;
 
     // GoldAPI returns price_gram_24k for both gold and silver
     const goldPerGramINR = goldData.price_gram_24k;
@@ -99,8 +109,8 @@ export const fetchMetalPricesWithKey = async (apiKey: string): Promise<MetalPric
       }),
     ]);
 
-    const goldData = await goldRes.json();
-    const silverData = await silverRes.json();
+    const goldData = await goldRes.json() as GoldApiResponse;
+    const silverData = await silverRes.json() as GoldApiResponse;
 
     cachedPrices = {
       gold: {
@@ -108,8 +118,8 @@ export const fetchMetalPricesWithKey = async (apiKey: string): Promise<MetalPric
         inr: Math.round(goldData.price_gram_24k * 100) / 100,
       },
       silver: {
-        usd: Math.round((silverData.price_gram / 83.5) * 100) / 100,
-        inr: Math.round(silverData.price_gram * 100) / 100,
+        usd: Math.round((silverData.price_gram_24k / 83.5) * 100) / 100,
+        inr: Math.round(silverData.price_gram_24k * 100) / 100,
       },
       timestamp: new Date().toISOString(),
     };
