@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Mail } from 'lucide-react';
+import { authApi } from '../lib/api';
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
@@ -7,9 +8,8 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/auth/google/url');
-      const data = await res.json();
-      window.location.href = data.authUrl;
+      const res = await authApi.getGoogleAuthUrl();
+      window.location.href = res.data.authUrl;
     } catch (error) {
       console.error('Failed to get auth URL:', error);
       setIsLoading(false);
